@@ -1,30 +1,32 @@
-const path = require("path");
 const express = require("express");
-// console.log(express)
-// const mongoose = require('mongoose')
+const { json, urlencoded } = express;
+const apiRouter = require("./router");
+
 const app = express();
-const PORT = 3001;
+const PORT = 4000;
 
-// const mongoURI = process.env.NODE_ENV === 'test' ? 'mongodb://localhost/unit11test' : 'mongodb://localhost/unit11dev';
-// mongoose.connect(mongoURI);
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
-/* handle parsing request body */
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/*
+Example url request coming in from client/user
 
-// handle requests for static files (OUR HTML FILE)
-// app.use(express.static(path.resolve(__dirname, '../client')));
+http://localhost:3000/tweets/elonmusk/bitcoin,fungible,valuation/10
 
-// define route handlers
-// app.use("/api", apiRouter);
+Use this for testing in postman
+
+*/
+
+// mount router
+app.use("/tweets", apiRouter);
 
 // catch-all route handler for any requests to an unknown route
-app.use((req, res) =>
+app.use((_req, res) =>
   res.status(404).send("This is not the page you're looking for...")
 );
 
 //express error handler
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   const defaultErr = {
     log: "Express error handler caught unknown middleware error",
     status: 500,
@@ -35,9 +37,8 @@ app.use((err, req, res, next) => {
   return res.status(errorObj.status).json(errorObj.message);
 });
 
-//start server
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}...`);
 });
 
-module.exports = app;
+module.exports = { PORT, app };
